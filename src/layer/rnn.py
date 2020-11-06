@@ -5,18 +5,28 @@ def softmax(x):
     return e_x / e_x.sum()
 
 class RNN():
-    def __init__(self, inputs, hidden_state=5, output_state=5):
+    def __init__(self, inputs, hidden_state=5, output_state=5,random_weight=3):
         self.param_size = inputs.shape[2]
         self.list_output = []
-        self.u = np.random.uniform(-1.0/np.sqrt(self.param_size), 1.0/np.sqrt(self.param_size), (hidden_state, self.param_size))
-        self.w = np.random.uniform(-1.0/np.sqrt(hidden_state), 1.0/np.sqrt(hidden_state), (hidden_state, hidden_state))
-        self.v = np.random.uniform(-1.0/np.sqrt(hidden_state), 1.0/np.sqrt(hidden_state), (output_state, hidden_state))
         self.b_xh = np.zeros(hidden_state)
         self.b_hy = np.zeros(output_state)
         self.hidden_state = hidden_state
         self.output_state = output_state
         self.inputs = inputs
-
+        self.init_weight(random_weight,hidden_state,output_state)
+    def init_weight(self,random_weight ,hidden_state ,output_state):
+        if random_weight == 0 :
+            self.u = np.zeros((hidden_state, self.param_size))
+            self.w = np.zeros((hidden_state, hidden_state))
+            self.v = np.zeros((output_state, hidden_state))
+        elif random_weight == 1 :
+            self.u = np.full((hidden_state, self.param_size),1)
+            self.w = np.full((hidden_state, hidden_state),1)
+            self.v = np.full((output_state, hidden_state),1)
+        else:
+            self.u = np.random.uniform(-1.0/np.sqrt(self.param_size), 1.0/np.sqrt(self.param_size), (hidden_state, self.param_size))
+            self.w = np.random.uniform(-1.0/np.sqrt(hidden_state), 1.0/np.sqrt(hidden_state), (hidden_state, hidden_state))
+            self.v = np.random.uniform(-1.0/np.sqrt(hidden_state), 1.0/np.sqrt(hidden_state), (output_state, hidden_state))
     def training(self):
         for sequence in self.inputs:
             self.forward(sequence)
@@ -49,5 +59,5 @@ seq_length = 4
 
 # print(training_data.shape)
 
-model = RNN(training_data, hidden_state=3, output_state=4)
+model = RNN(training_data,random_weight=2, hidden_state=3, output_state=4)
 model.training()
